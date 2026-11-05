@@ -79,7 +79,7 @@
     background: linear-gradient(135deg, #5b4a8a, #2c2050); transition: all .3s; }
   .step.on .gem { border-color: #fff; background: linear-gradient(135deg, var(--gold1), var(--gold2) 50%, var(--gold3)); box-shadow: 0 0 14px var(--gold2); }
   .step.on { color: var(--gold1); }
-  .bar { width: 34px; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .2); margin-bottom: 18px; }
+  .bar { width: clamp(10px, 4vw, 30px); height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .2); margin-bottom: 18px; }
   .bar.on { background: linear-gradient(90deg, var(--gold2), var(--gold3)); box-shadow: 0 0 8px var(--gold2); }
 
   /* 金の枠のパネル */
@@ -182,6 +182,72 @@
   .confetti { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 2px; animation: fall linear forwards; }
   @keyframes fall { to { transform: translateY(115vh) rotate(720deg); } }
 
+  /* 好き嫌いのカード（絵はお皿の上に） */
+  .likes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (min-width: 480px) { .likes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .lk { position: relative; padding: 10px 8px 8px; border-radius: 16px; text-align: center; border: 3px solid transparent;
+    background: linear-gradient(180deg, #3b2a78, #1e1446) padding-box, linear-gradient(180deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, .12)) border-box; box-shadow: 0 4px 0 #0b0726; }
+  .lk.like { background: linear-gradient(180deg, #7a2a5c, #3d0c2e) padding-box, linear-gradient(180deg, #ffd6f0, #ff4fa8) border-box; box-shadow: 0 4px 0 #0b0726, 0 0 16px rgba(255, 79, 168, .55); }
+  .lk.normal { background: linear-gradient(180deg, #3d3a5a, #23203a) padding-box, linear-gradient(180deg, var(--silver1), var(--silver3)) border-box; }
+  .lk.dislike { background: linear-gradient(180deg, #1f3a6e, #0d1d40) padding-box, linear-gradient(180deg, var(--sapphire1), var(--sapphire2)) border-box; box-shadow: 0 4px 0 #0b0726, 0 0 16px rgba(47, 124, 246, .55); }
+  .plate { display: block; width: 86px; height: 86px; margin: 0 auto 4px; border-radius: 50%; overflow: hidden; background: #fff;
+    border: 3px solid #fff3d6; box-shadow: 0 0 0 2px rgba(255, 211, 77, .5), 0 4px 10px rgba(0, 0, 0, .4); }
+  .plate img { width: 100%; height: 100%; display: block; transform: scale(1.12); }
+  .lk.like .plate { animation: pop .25s ease-out; }
+  .lk-name { display: block; margin-bottom: 6px; font: 900 16px/1.3 'M PLUS Rounded 1c', sans-serif; }
+  .seg { display: flex; gap: 4px; }
+  .seg button { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0; cursor: pointer; font: 800 clamp(11px, 3.2vw, 13px)/1.2 'M PLUS Rounded 1c', sans-serif; letter-spacing: -.5px; white-space: nowrap; color: var(--muted);
+    border-radius: 10px; border: 2px solid rgba(255, 255, 255, .22); background: rgba(0, 0, 0, .25); }
+  .seg button[aria-pressed="true"][data-like="like"] { color: #fff; border-color: #ffd6f0; background: linear-gradient(180deg, #ff7ac4, #c2187a); }
+  .seg button[aria-pressed="true"][data-like="normal"] { color: #23203a; border-color: #fff; background: linear-gradient(180deg, var(--silver1), var(--silver2)); }
+  .seg button[aria-pressed="true"][data-like="dislike"] { color: #fff; border-color: var(--sapphire1); background: linear-gradient(180deg, var(--sapphire2), var(--sapphire3)); }
+
+  /* みんなの集計 */
+  .open-stats { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 52px; margin: 0 0 16px; cursor: pointer;
+    font: 900 17px 'M PLUS Rounded 1c', sans-serif; color: #fff; border-radius: 999px; border: 2px solid var(--sapphire1);
+    background: linear-gradient(180deg, var(--sapphire2), var(--sapphire3)); box-shadow: 0 4px 0 #06173d, 0 0 16px rgba(47, 124, 246, .45); }
+  .stats { position: fixed; inset: 0; z-index: 12; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
+    background: radial-gradient(120% 900px at 50% 0%, var(--night3) 0%, var(--night2) 45%, var(--night1) 100%); }
+  .stats .wrap { padding-top: 18px; }
+  .st-head { display: flex; align-items: flex-end; gap: 6px; }
+  .st-head h2 { flex: 1 1 auto; min-width: 0; margin: 0 0 18px; font: 900 clamp(24px, 7.6vw, 32px)/1.2 'M PLUS Rounded 1c', sans-serif; white-space: nowrap;
+    background: linear-gradient(180deg, #fffbe6 0%, var(--gold2) 50%, var(--gold3) 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 3px 0 var(--gold-dark)); }
+  .st-head img { flex: 0 0 auto; height: clamp(120px, 36vw, 160px); animation: hop .8s ease-out .2s 2 both; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45)); }
+  .count-big { display: flex; align-items: baseline; justify-content: center; gap: 6px; font: 900 22px 'M PLUS Rounded 1c', sans-serif; color: var(--gold1); }
+  .count-big b { font-size: 56px; line-height: 1; background: linear-gradient(180deg, #fffbe6, var(--gold2) 55%, var(--gold3)); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 3px 0 var(--gold-dark)); }
+  .meter { height: 14px; margin: 10px 0 2px; border-radius: 999px; overflow: hidden; background: rgba(255, 255, 255, .12); }
+  .meter i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--gold2), var(--gold3)); box-shadow: 0 0 10px var(--gold2); }
+  .rank { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .rank .no { flex: 0 0 auto; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 900 16px 'M PLUS Rounded 1c', sans-serif; color: #2a1260;
+    background: linear-gradient(180deg, #e6e0ff, #9d8fd6); }
+  .rank.r1 .no { background: linear-gradient(180deg, var(--gold1), var(--gold3)); box-shadow: 0 0 12px var(--gold2); }
+  .rank.r2 .no { background: linear-gradient(180deg, var(--silver1), var(--silver2)); }
+  .rank.r3 .no { background: linear-gradient(180deg, #ffd7b0, #c8732f); }
+  .rank .body { flex: 1 1 auto; min-width: 0; }
+  .rank .lbl { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; }
+  .rank .lbl span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank .lbl span:last-child { flex: 0 0 auto; color: var(--gold1); }
+  .hbar { height: 12px; border-radius: 999px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+  .hbar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ff7ac4, var(--gold2)); }
+  .lrow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .lrow .plate { flex: 0 0 auto; width: 48px; height: 48px; margin: 0; border-width: 2px; }
+  .lrow .body { flex: 1 1 auto; min-width: 0; }
+  .lrow .lbl { font-weight: 700; font-size: 16px; }
+  .stack { display: flex; height: 22px; border-radius: 8px; overflow: hidden; background: rgba(255, 255, 255, .08); font: 800 12px/22px 'M PLUS Rounded 1c', sans-serif; text-align: center; }
+  .stack span { overflow: hidden; white-space: nowrap; }
+  .stack .like { background: linear-gradient(180deg, #ff7ac4, #c2187a); color: #fff; }
+  .stack .normal { background: linear-gradient(180deg, var(--silver1), var(--silver2)); color: #23203a; }
+  .stack .dislike { background: linear-gradient(180deg, var(--sapphire2), var(--sapphire3)); color: #fff; }
+  .stack .empty { padding-left: 8px; text-align: left; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+  .legend i { display: inline-block; width: 12px; height: 12px; margin-right: 4px; border-radius: 3px; vertical-align: -1px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 15px; background: rgba(229, 36, 59, .22); border: 2px solid rgba(255, 138, 138, .7); }
+  .chip.ok { background: rgba(25, 180, 106, .2); border-color: var(--emerald2); }
+  .empty { color: var(--muted); font-size: 15px; }
+
   [hidden] { display: none !important; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -202,11 +268,13 @@
     </div>
   </div>
   <p class="bubble" id="bubble" role="status"></p>
+  <button type="button" class="open-stats" id="open-stats" hidden></button>
 
   <div class="steps" aria-hidden="true">
     <div class="step" id="st-name"><span class="gem"></span>名前</div><span class="bar" id="bar-1"></span>
     <div class="step" id="st-allergy"><span class="gem"></span>アレルギー</div><span class="bar" id="bar-2"></span>
-    <div class="step" id="st-wish"><span class="gem"></span>食べたい</div><span class="bar" id="bar-3"></span>
+    <div class="step" id="st-likes"><span class="gem"></span>好き嫌い</div><span class="bar" id="bar-3"></span>
+    <div class="step" id="st-wish"><span class="gem"></span>食べたい</div><span class="bar" id="bar-4"></span>
     <div class="step" id="st-send"><span class="gem"></span>送る</div>
   </div>
 
@@ -226,7 +294,14 @@
     </section>
 
     <section class="panel">
-      <h2 class="ptitle"><span class="num">3</span><span id="t-wish"></span></h2>
+      <h2 class="ptitle"><span class="num">3</span><span id="t-likes"></span></h2>
+      <p class="sub" id="t-likes-lead"></p>
+      <div id="likes"></div>
+      <div class="other"><label for="likes-note" id="t-likes-note"></label><input class="field" id="likes-note" type="text" autocomplete="off"></div>
+    </section>
+
+    <section class="panel">
+      <h2 class="ptitle"><span class="num">4</span><span id="t-wish"></span></h2>
       <p class="sub" id="t-wish-lead"></p>
       <div id="wishes"></div>
     </section>
@@ -245,8 +320,18 @@
     <div class="win-card">
       <h2 id="t-done-title"></h2>
       <p id="t-done-text"></p>
-      <button type="button" class="again" id="again">もう一度入れる</button>
+      <button type="button" class="again" id="win-stats"></button>
+      <p style="margin:12px 0 0"><button type="button" class="again" id="again">もう一度入れる</button></p>
     </div>
+  </div>
+</div>
+
+<div class="stats" id="stats" hidden>
+  <div class="wrap">
+    <div class="st-head"><h2 id="t-stats"></h2><img id="stats-molly" alt=""></div>
+    <p class="bubble" id="stats-bubble" role="status"></p>
+    <div id="stats-body"></div>
+    <button type="button" class="open-stats" id="close-stats"></button>
   </div>
 </div>
 
@@ -254,17 +339,18 @@
   // Apps Script で開いたときは中身を埋め込む。GitHub Pages では BOOT は null で、開いたあと API から受け取る
   //（2026-11-05 代表「このアプリケーションは Google Apps Script のユーザーによって…」の帯を出さないため）
   var BOOT = null;
-  var ART = {"ladle":"molly_ladle.png","dish":"molly_dish.png","wait":"molly_wait.png","jump":"molly_jump.png"};
+  var ART = {"ladle":"molly_ladle.png","dish":"molly_dish.png","wait":"molly_wait.png","jump":"molly_jump.png","food_washoku":"food_washoku.jpg","food_yoshoku":"food_yoshoku.jpg","food_chuka":"food_chuka.jpg","food_curry":"food_curry.jpg","food_noodle":"food_noodle.jpg","food_donburi":"food_donburi.jpg","food_fried":"food_fried.jpg","food_meatdish":"food_meatdish.jpg","food_fishdish":"food_fishdish.jpg","food_vegdish":"food_vegdish.jpg","food_soup":"food_soup.jpg","food_dessert":"food_dessert.jpg","food_mushroom":"food_mushroom.jpg","food_greenpepper":"food_greenpepper.jpg","food_eggplant":"food_eggplant.jpg","food_negi":"food_negi.jpg","food_coriander":"food_coriander.jpg","food_natto":"food_natto.jpg","food_liver":"food_liver.jpg","food_umeboshi":"food_umeboshi.jpg"};
   var API = "https://script.google.com/macros/s/AKfycbzu0u4K4k8pBdhBoKTVwdoxPIe8EfF6ipDirCPoBCJKCW5NaK77QEPVugXWlCUnZmQ/exec";
 </script>
 <script>
 function startSurvey(BOOT) {
   var T = BOOT.text;
-  var state = { picked: {}, none: false };  // picked: { key: level('' は重さ未選択) }
+  var state = { picked: {}, none: false, likes: {} };  // picked: { key: level('' は重さ未選択) } / likes: { カード: like|normal|dislike }
   var SAY = {
     start: '名前を選んで、食べられないものを教えてね！',
     allergy: 'ありがとう！ 次は食べられないものだよ。',
     level: 'どのくらい？ 重さも選んでね。',
+    likes: '好きなもの・苦手なものも教えてね！ 分かるものだけでいいよ。',
     wish: 'あとは食べたいランチを書いてね！ 空でも送れるよ。',
     ready: '準備OK！ 下の金色のボタンで送ってね！'
   };
@@ -306,6 +392,48 @@ function startSurvey(BOOT) {
     wishInputs.push(inp);
   }
   function wishList() { return wishInputs.map(function (i) { return i.value.trim(); }).filter(function (v) { return v; }); }
+  // 好き嫌いのカード
+  $('t-likes').textContent = T.LIKES_TITLE; $('t-likes-lead').textContent = T.LIKES_LEAD;
+  $('t-likes-note').textContent = T.LIKES_NOTE_LABEL;
+  var likesNote = $('likes-note');
+  likesNote.placeholder = T.LIKES_NOTE_PLACEHOLDER; likesNote.maxLength = BOOT.likes.noteMax;
+  function renderLikes() {
+    var box = $('likes');
+    box.textContent = '';
+    BOOT.likes.groups.forEach(function (g) {
+      var cat = el('div', 'cat');
+      cat.appendChild(el('div', 'ribbon', g.label));
+      var grid = el('div', 'likes');
+      g.items.forEach(function (it) {
+        var v = state.likes[it.key] || '';
+        var card = el('div', 'lk' + (v ? ' ' + v : ''));
+        card.setAttribute('data-card', it.key);
+        var plate = el('span', 'plate');
+        var pic = el('img'); pic.src = img('food_' + it.key); pic.alt = '';
+        plate.appendChild(pic); card.appendChild(plate);
+        card.appendChild(el('span', 'lk-name', it.label));
+        var seg = el('div', 'seg');
+        seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', it.label);
+        BOOT.likes.values.forEach(function (x) {
+          var b = el('button', '', x.label);
+          b.type = 'button';
+          b.setAttribute('data-like', x.key);
+          b.setAttribute('aria-pressed', v === x.key ? 'true' : 'false');
+          b.addEventListener('click', function () {
+            if (state.likes[it.key] === x.key) delete state.likes[it.key]; else state.likes[it.key] = x.key;
+            renderLikes(); progress();
+          });
+          seg.appendChild(b);
+        });
+        card.appendChild(seg);
+        grid.appendChild(card);
+      });
+      cat.appendChild(grid);
+      box.appendChild(cat);
+    });
+  }
+  renderLikes();
+
   $('t-privacy').textContent = T.LEAD + ' ' + T.PRIVACY; $('submit').textContent = T.SUBMIT;
   $('t-done-title').textContent = T.DONE_TITLE; $('t-done-text').textContent = T.DONE_TEXT;
 
@@ -332,17 +460,21 @@ function startSurvey(BOOT) {
     var allergyDone = state.none || ((keys.length > 0 || hasOther) && levelsDone);
     var nameDone = !!sel.value;
     var wishDone = wishList().length > 0;
+    var likesDone = Object.keys(state.likes).length > 0;
     $('st-name').classList.toggle('on', nameDone);
     $('bar-1').classList.toggle('on', nameDone);
     $('st-allergy').classList.toggle('on', allergyDone);
     $('bar-2').classList.toggle('on', nameDone && allergyDone);
-    $('st-wish').classList.toggle('on', wishDone);
+    $('st-likes').classList.toggle('on', likesDone);
     $('bar-3').classList.toggle('on', nameDone && allergyDone);
+    $('st-wish').classList.toggle('on', wishDone);
+    $('bar-4').classList.toggle('on', nameDone && allergyDone);
     $('st-send').classList.toggle('on', nameDone && allergyDone);
     $('submit').classList.toggle('ready', nameDone && allergyDone && !BOOT.rosterError);
     if (!nameDone) say(SAY.start);
     else if (keys.length && !levelsDone) say(SAY.level);
     else if (!allergyDone) say(SAY.allergy);
+    else if (!likesDone) say(SAY.likes);
     else if (!wishDone) say(SAY.wish);
     else say(SAY.ready);
   }
@@ -431,7 +563,7 @@ function startSurvey(BOOT) {
     if (!state.none && !list.length && !otherText) { fail('当てはまるものを選ぶか、「' + T.NONE_LABEL + '」を押してね！'); return; }
     var btn = $('submit');
     btn.disabled = true; btn.textContent = '送っています…';
-    sendAnswer({ name: sel.value, none: state.none, allergies: list, other: otherText, wishes: wishList() },
+    sendAnswer({ name: sel.value, none: state.none, allergies: list, other: otherText, wishes: wishList(), likes: state.likes, likesNote: likesNote.value.trim() },
       function (r) {
         btn.disabled = false; btn.textContent = T.SUBMIT;
         if (!r || !r.ok) { fail((r && r.message) || '送れませんでした。もう一度押してね。'); return; }
@@ -448,13 +580,118 @@ function startSurvey(BOOT) {
 
   // 入れ直すときは、まっさらにする（前の人の選んだものを残さない）
   $('again').addEventListener('click', function () {
-    state = { picked: {}, none: false }; sel.value = ''; other.value = '';
+    state = { picked: {}, none: false, likes: {} }; sel.value = ''; other.value = ''; likesNote.value = '';
     wishInputs.forEach(function (i) { i.value = ''; });
+    renderLikes();
     $('win').hidden = true; $('win-molly').src = img('jump');
     render(); window.scrollTo(0, 0);
   });
 
+  // みんなの集計（人数だけ。名前は来ない）
+  $('open-stats').textContent = T.STATS_BUTTON; $('open-stats').hidden = false;
+  $('win-stats').textContent = T.STATS_BUTTON;
+  $('t-stats').textContent = T.STATS_TITLE; $('close-stats').textContent = T.BACK;
+  function openStats() {
+    $('stats').hidden = false; $('stats').scrollTop = 0;
+    $('stats-molly').src = img('ladle');
+    $('stats-bubble').className = 'bubble'; $('stats-bubble').textContent = '集計しています…';
+    $('stats-body').textContent = '';
+    fetchStats(function (r) {
+      if (!r || !r.ok) { statsFail((r && r.message) || T.STATS_ERROR); return; }
+      showStats(r);
+    }, function () { statsFail(T.STATS_ERROR); });
+  }
+  function statsFail(text) {
+    $('stats-bubble').className = 'bubble warn'; $('stats-bubble').textContent = text; $('stats-molly').src = img('wait');
+  }
+  function section(title, lead) {
+    var p = el('section', 'panel');
+    p.appendChild(el('h3', 'ptitle', title));
+    if (lead) p.appendChild(el('p', 'sub', lead));
+    $('stats-body').appendChild(p);
+    return p;
+  }
+  function showStats(r) {
+    var head = section('答えてくれた人');
+    var big = el('div', 'count-big');
+    big.appendChild(el('b', '', String(r.respondents)));
+    big.appendChild(document.createTextNode('人 / ' + r.roster + '人'));
+    head.appendChild(big);
+    var m = el('div', 'meter'); var mi = el('i'); mi.style.width = Math.min(100, Math.round(r.respondents * 100 / Math.max(1, r.roster))) + '%'; m.appendChild(mi); head.appendChild(m);
+    head.appendChild(el('p', 'sub', T.STATS_LEAD));
+    if (r.few) { $('stats-bubble').textContent = T.STATS_FEW; $('stats-molly').src = img('wait'); return; }
+
+    var w = section('食べたいランチ ランキング', r.wishers + '人が書いてくれました（似ている料理はまとめています）');
+    if (!r.wishes.length) w.appendChild(el('p', 'empty', 'まだありません'));
+    var top = r.wishes.length ? r.wishes[0].count : 1;
+    r.wishes.forEach(function (x, i) {
+      var row = el('div', 'rank' + (i < 3 ? ' r' + (i + 1) : ''));
+      row.appendChild(el('span', 'no', String(i + 1)));
+      var body = el('div', 'body');
+      var lbl = el('div', 'lbl'); lbl.appendChild(el('span', '', x.label)); lbl.appendChild(el('span', '', x.count + '人'));
+      body.appendChild(lbl);
+      var hb = el('div', 'hbar'); var hi = el('i'); hi.style.width = Math.round(x.count * 100 / top) + '%'; hb.appendChild(hi); body.appendChild(hb);
+      row.appendChild(body);
+      w.appendChild(row);
+    });
+
+    var l = section('好きなもの・苦手なもの');
+    var lg = el('div', 'legend');
+    [['好き', '#ff7ac4'], ['ふつう', '#d5d5e3'], ['苦手', '#2f7cf6']].forEach(function (x) {
+      var s = el('span'); var i = el('i'); i.style.background = x[1]; s.appendChild(i); s.appendChild(document.createTextNode(x[0])); lg.appendChild(s);
+    });
+    l.appendChild(lg);
+    r.likes.forEach(function (c) {
+      var n = c.like + c.normal + c.dislike;
+      var row = el('div', 'lrow');
+      var plate = el('span', 'plate'); var pic = el('img'); pic.src = img('food_' + c.key); pic.alt = ''; plate.appendChild(pic); row.appendChild(plate);
+      var body = el('div', 'body');
+      body.appendChild(el('div', 'lbl', c.label));
+      var st = el('div', 'stack');
+      if (!n) st.appendChild(el('span', 'empty', 'まだ答えなし'));
+      ['like', 'normal', 'dislike'].forEach(function (k) {
+        if (!c[k]) return;
+        var seg = el('span', k, c[k] + '人'); seg.style.width = (c[k] * 100 / n) + '%'; st.appendChild(seg);
+      });
+      body.appendChild(st);
+      row.appendChild(body);
+      l.appendChild(row);
+    });
+
+    var a = section('食べられないもの', '「苦手なだけ」も含めた人数です');
+    var chips = el('div', 'chips');
+    r.allergies.forEach(function (x) { chips.appendChild(el('span', 'chip', x.label + ' ' + x.count + '人')); });
+    chips.appendChild(el('span', 'chip ok', 'アレルギーなし ' + r.none + '人'));
+    a.appendChild(chips);
+    if (r.allergyHidden) a.appendChild(el('p', 'sub', 'ほかに ' + r.allergyHidden + ' 品目あります（1人だけの品目は、だれのことか分からないように名前を出していません。代表は全部見ています）。'));
+
+    // モリーの発表
+    var best = null, worst = null;
+    r.likes.forEach(function (c) {
+      if (c.like && (!best || c.like > best.like)) best = c;
+      if (c.dislike && (!worst || c.dislike > worst.dislike)) worst = c;
+    });
+    var talk = r.roster + '人中 ' + r.respondents + '人が答えてくれたよ！';
+    if (r.wishes.length) talk += ' 食べたいランチの1位は「' + r.wishes[0].label + '」！';
+    if (best) talk += ' 好きがいちばん多いのは「' + best.label + '」。';
+    if (worst) talk += ' 苦手が多いのは「' + worst.label + '」だから気をつけるね。';
+    $('stats-bubble').textContent = talk; $('stats-molly').src = img('dish');
+  }
+  $('open-stats').addEventListener('click', openStats);
+  $('win-stats').addEventListener('click', function () { $('win').hidden = true; $('win-molly').src = img('jump'); openStats(); });
+  $('close-stats').addEventListener('click', function () { $('stats').hidden = true; });
+
   render();
+}
+
+/** 集計を受け取る。Apps Script の中なら google.script.run、GitHub Pages なら API へ */
+function fetchStats(onOk, onNg) {
+  if (window.google && google.script && google.script.run) {
+    google.script.run.withSuccessHandler(onOk).withFailureHandler(onNg).getStats();
+    return;
+  }
+  fetch(API + '?api=stats', { credentials: 'omit', cache: 'no-store' })
+    .then(function (r) { return r.json(); }).then(onOk, onNg);
 }
 
 /** 送る。Apps Script の中なら google.script.run、GitHub Pages なら API へ（本文は text/plain。外のページから送れる形） */
