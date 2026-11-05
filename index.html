@@ -44,31 +44,31 @@
   .wrap { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; padding: 14px 16px 64px; }
 
   /* 見出しとモリー */
-  .hero { position: relative; overflow: hidden; margin-left: -16px; margin-right: -16px; padding: 0 16px; display: flex; align-items: flex-end; min-height: 230px; margin-bottom: 6px; }
-  .title { position: relative; z-index: 2; flex: 1 1 auto; padding-bottom: 18px; }
-  .badge { display: inline-block; padding: 3px 14px; border-radius: 999px; font: 900 13px/1.6 'M PLUS Rounded 1c', sans-serif; letter-spacing: 2px;
+  .hero { position: relative; overflow: hidden; margin-left: -16px; margin-right: -16px; padding: 0 16px; display: flex; align-items: flex-end; gap: 4px; margin-bottom: 6px; }
+  .title { position: relative; z-index: 2; flex: 1 1 auto; min-width: 0; padding-bottom: 18px; white-space: nowrap; }
+  .badge { display: inline-block; padding: 3px 12px; border-radius: 999px; font: 900 clamp(10px, 3vw, 13px)/1.6 'M PLUS Rounded 1c', sans-serif; letter-spacing: 1.5px; white-space: nowrap;
     color: #2a1260; background: linear-gradient(180deg, var(--gold1), var(--gold2) 55%, var(--gold3)); box-shadow: 0 0 14px rgba(255, 211, 77, .6); }
-  h1 { margin: 8px 0 0; font: 900 34px/1.15 'M PLUS Rounded 1c', sans-serif; letter-spacing: 1px;
+  h1 { margin: 8px 0 0; font: 900 clamp(26px, 8.4vw, 36px)/1.15 'M PLUS Rounded 1c', sans-serif; letter-spacing: 1px; white-space: nowrap;
     background: linear-gradient(180deg, #fffbe6 0%, var(--gold2) 50%, var(--gold3) 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
     filter: drop-shadow(0 3px 0 var(--gold-dark)) drop-shadow(0 0 12px rgba(255, 190, 60, .55)); }
-  h1 small { display: block; font-size: 20px; letter-spacing: 3px; }
-  .molly-box { position: relative; flex: 0 0 auto; width: 170px; height: 230px; }
+  h1 small { display: block; font-size: .58em; letter-spacing: 3px; }
+  .molly-box { position: relative; flex: 0 0 auto; width: clamp(128px, 40vw, 176px); height: clamp(186px, 58vw, 236px); }
   .halo { position: absolute; left: 50%; top: 52%; width: 210px; height: 210px; transform: translate(-50%, -50%); border-radius: 50%;
     background: radial-gradient(circle, rgba(255, 226, 120, .55) 0%, rgba(255, 170, 60, .18) 45%, transparent 70%); animation: pulse 2.6s ease-in-out infinite; }
   .rays { position: absolute; left: 50%; top: 52%; width: 260px; height: 260px; transform: translate(-50%, -50%); border-radius: 50%; opacity: .35;
     background: repeating-conic-gradient(rgba(255, 230, 150, .5) 0deg 8deg, transparent 8deg 24deg); animation: spin 18s linear infinite;
     -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); mask: radial-gradient(circle, #000 30%, transparent 70%); }
-  .molly { position: absolute; left: 50%; bottom: 0; height: 220px; transform: translateX(-50%); animation: bob 2.8s ease-in-out infinite;
+  .molly { position: absolute; left: 50%; bottom: 0; height: 96%; transform: translateX(-46%); animation: bob 2.8s ease-in-out infinite;
     filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45)); }
   .molly.shake { animation: shake .5s ease-in-out 2; }
-  @keyframes bob { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-8px); } }
-  @keyframes shake { 0%, 100% { transform: translateX(-50%) rotate(0); } 25% { transform: translateX(-56%) rotate(-5deg); } 75% { transform: translateX(-44%) rotate(5deg); } }
+  @keyframes bob { 0%, 100% { transform: translateX(-46%) translateY(0); } 50% { transform: translateX(-46%) translateY(-8px); } }
+  @keyframes shake { 0%, 100% { transform: translateX(-46%) rotate(0); } 25% { transform: translateX(-52%) rotate(-5deg); } 75% { transform: translateX(-40%) rotate(5deg); } }
   @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(.92); opacity: .8; } 50% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; } }
   @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
   .bubble { position: relative; z-index: 3; margin: -4px 0 16px; padding: 12px 16px; border-radius: 16px; font-weight: 700; font-size: 17px;
     color: #2a1260; background: linear-gradient(180deg, #fffdf4, #fff0c2); border: 3px solid var(--gold2); box-shadow: 0 4px 0 var(--gold-dark), 0 0 18px rgba(255, 211, 77, .35); }
-  .bubble::after { content: ''; position: absolute; right: 70px; top: -14px; border: 10px solid transparent; border-bottom: 12px solid var(--gold2); border-top: 0; }
+  .bubble::after { content: ''; position: absolute; right: clamp(56px, 18vw, 80px); top: -14px; border: 10px solid transparent; border-bottom: 12px solid var(--gold2); border-top: 0; }
   .bubble.warn { color: #fff; background: linear-gradient(180deg, var(--ruby1), var(--ruby2)); border-color: #ffd0d0; box-shadow: 0 4px 0 var(--ruby3), 0 0 18px rgba(229, 36, 59, .5); }
   .bubble.warn::after { border-bottom-color: #ffd0d0; }
 
@@ -105,7 +105,7 @@
   .ribbon { display: inline-block; margin-bottom: 10px; padding: 2px 16px 2px 12px; font: 800 15px/1.6 'M PLUS Rounded 1c', sans-serif; color: #fff;
     background: linear-gradient(90deg, var(--sapphire2), rgba(47, 124, 246, 0)); border-left: 4px solid var(--sapphire1); border-radius: 4px; }
   .items { display: flex; flex-wrap: wrap; gap: 10px; }
-  .card { position: relative; min-width: 104px; min-height: 64px; padding: 10px 18px; font: 900 21px/1.3 'M PLUS Rounded 1c', sans-serif; color: var(--text); cursor: pointer;
+  .card { position: relative; min-width: 72px; min-height: 52px; padding: 8px 14px; font: 900 17px/1.3 'M PLUS Rounded 1c', sans-serif; color: var(--text); cursor: pointer;
     border-radius: 14px; border: 3px solid transparent;
     background: linear-gradient(180deg, #3b2a78, #1e1446) padding-box, linear-gradient(180deg, var(--sapphire1), var(--sapphire3)) border-box;
     box-shadow: 0 4px 0 #0b0726, 0 0 0 rgba(0, 0, 0, 0); transition: transform .12s, box-shadow .2s; }
@@ -116,6 +116,16 @@
     display: grid; place-items: center; font-size: 15px; color: #2a1260; background: linear-gradient(180deg, var(--gold1), var(--gold3)); border: 2px solid #fff; }
   @keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
 
+  .card .star { margin-right: 3px; color: var(--gold2); text-shadow: 0 0 6px rgba(255, 211, 77, .8); }
+  .field { width: 100%; min-height: 54px; padding: 12px 14px; font: 700 18px 'BIZ UDPGothic', sans-serif; color: var(--text);
+    border-radius: 14px; border: 2px solid rgba(159, 210, 255, .6); background: rgba(10, 6, 30, .7); box-shadow: inset 0 0 16px rgba(47, 124, 246, .25); }
+  .field::placeholder { color: rgba(207, 195, 238, .55); }
+  .field:focus { outline: none; border-color: var(--gold2); box-shadow: 0 0 0 3px rgba(255, 211, 77, .35); }
+  .other { margin-top: 16px; }
+  .other label, .wish label { display: block; margin-bottom: 6px; font: 800 15px 'M PLUS Rounded 1c', sans-serif; color: var(--sapphire1); }
+  .wish { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .wish .no { flex: 0 0 auto; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 900 16px 'M PLUS Rounded 1c', sans-serif;
+    color: #2a1260; background: linear-gradient(180deg, #ffd6f0, #ff7ac4); box-shadow: 0 0 10px rgba(255, 122, 196, .6); }
   .levels { margin-top: 12px; padding: 12px; border-radius: 14px; background: rgba(0, 0, 0, .28); border: 1px dashed rgba(255, 211, 77, .4); animation: rise .25s ease-out; }
   @keyframes rise { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
   .levels-title { margin-bottom: 8px; font-weight: 700; color: var(--gold1); }
@@ -196,6 +206,7 @@
   <div class="steps" aria-hidden="true">
     <div class="step" id="st-name"><span class="gem"></span>名前</div><span class="bar" id="bar-1"></span>
     <div class="step" id="st-allergy"><span class="gem"></span>アレルギー</div><span class="bar" id="bar-2"></span>
+    <div class="step" id="st-wish"><span class="gem"></span>食べたい</div><span class="bar" id="bar-3"></span>
     <div class="step" id="st-send"><span class="gem"></span>送る</div>
   </div>
 
@@ -210,7 +221,14 @@
       <h2 class="ptitle"><span class="num">2</span><span id="t-allergy"></span></h2>
       <p class="sub" id="t-allergy-lead"></p>
       <div id="cats"></div>
+      <div class="other"><label for="other" id="t-other"></label><input class="field" id="other" type="text" autocomplete="off"></div>
       <button type="button" class="none" id="none" aria-pressed="false"><span class="orb"></span><span id="t-none"></span></button>
+    </section>
+
+    <section class="panel">
+      <h2 class="ptitle"><span class="num">3</span><span id="t-wish"></span></h2>
+      <p class="sub" id="t-wish-lead"></p>
+      <div id="wishes"></div>
     </section>
 
     <p class="privacy" id="t-privacy"></p>
@@ -247,6 +265,7 @@ function startSurvey(BOOT) {
     start: '名前を選んで、食べられないものを教えてね！',
     allergy: 'ありがとう！ 次は食べられないものだよ。',
     level: 'どのくらい？ 重さも選んでね。',
+    wish: 'あとは食べたいランチを書いてね！ 空でも送れるよ。',
     ready: '準備OK！ 下の金色のボタンで送ってね！'
   };
 
@@ -265,6 +284,28 @@ function startSurvey(BOOT) {
   $('t-name').textContent = T.NAME_LABEL;
   $('t-allergy').textContent = T.ALLERGY_TITLE; $('t-allergy-lead').textContent = T.ALLERGY_LEAD;
   $('t-none').textContent = T.NONE_LABEL;
+  $('t-other').textContent = T.OTHER_LABEL;
+  var other = $('other');
+  other.placeholder = T.OTHER_PLACEHOLDER; other.maxLength = BOOT.otherMax;
+  other.addEventListener('input', function () {
+    if (other.value.trim() && state.none) { state.none = false; $('none').setAttribute('aria-pressed', 'false'); }
+    progress();
+  });
+  $('t-wish').textContent = T.WISH_TITLE; $('t-wish-lead').textContent = T.WISH_LEAD;
+  var wishInputs = [];
+  for (var wi = 0; wi < BOOT.wishes.max; wi++) {
+    var row = el('div', 'wish');
+    row.appendChild(el('span', 'no', String(wi + 1)));
+    var inp = el('input', 'field');
+    inp.type = 'text'; inp.autocomplete = 'off'; inp.maxLength = BOOT.wishes.maxChars;
+    inp.placeholder = (T.WISH_PLACEHOLDERS || [])[wi] || '';
+    inp.setAttribute('aria-label', T.WISH_TITLE + ' ' + (wi + 1));
+    inp.addEventListener('input', function () { progress(); });
+    row.appendChild(inp);
+    $('wishes').appendChild(row);
+    wishInputs.push(inp);
+  }
+  function wishList() { return wishInputs.map(function (i) { return i.value.trim(); }).filter(function (v) { return v; }); }
   $('t-privacy').textContent = T.LEAD + ' ' + T.PRIVACY; $('submit').textContent = T.SUBMIT;
   $('t-done-title').textContent = T.DONE_TITLE; $('t-done-text').textContent = T.DONE_TEXT;
 
@@ -287,17 +328,22 @@ function startSurvey(BOOT) {
   function progress() {
     var keys = Object.keys(state.picked);
     var levelsDone = keys.every(function (k) { return !!state.picked[k]; });
-    var allergyDone = state.none || (keys.length > 0 && levelsDone);
+    var hasOther = !!other.value.trim();
+    var allergyDone = state.none || ((keys.length > 0 || hasOther) && levelsDone);
     var nameDone = !!sel.value;
+    var wishDone = wishList().length > 0;
     $('st-name').classList.toggle('on', nameDone);
     $('bar-1').classList.toggle('on', nameDone);
     $('st-allergy').classList.toggle('on', allergyDone);
     $('bar-2').classList.toggle('on', nameDone && allergyDone);
+    $('st-wish').classList.toggle('on', wishDone);
+    $('bar-3').classList.toggle('on', nameDone && allergyDone);
     $('st-send').classList.toggle('on', nameDone && allergyDone);
     $('submit').classList.toggle('ready', nameDone && allergyDone && !BOOT.rosterError);
     if (!nameDone) say(SAY.start);
     else if (keys.length && !levelsDone) say(SAY.level);
     else if (!allergyDone) say(SAY.allergy);
+    else if (!wishDone) say(SAY.wish);
     else say(SAY.ready);
   }
 
@@ -309,7 +355,9 @@ function startSurvey(BOOT) {
       cat.appendChild(el('div', 'ribbon', c.label));
       var items = el('div', 'items');
       c.items.forEach(function (it) {
-        var b = el('button', 'card', it.label);
+        var b = el('button', 'card');
+        if (it.required) { var st = el('span', 'star', '★'); st.setAttribute('aria-label', '表示が義務の品目'); b.appendChild(st); }
+        b.appendChild(document.createTextNode(it.label));
         b.type = 'button';
         b.setAttribute('data-key', it.key);
         b.setAttribute('aria-pressed', state.picked.hasOwnProperty(it.key) ? 'true' : 'false');
@@ -349,7 +397,7 @@ function startSurvey(BOOT) {
 
   $('none').addEventListener('click', function () {
     state.none = !state.none;
-    if (state.none) state.picked = {};
+    if (state.none) { state.picked = {}; other.value = ''; }
     render();
   });
 
@@ -379,10 +427,11 @@ function startSurvey(BOOT) {
     if (!sel.value) { fail('名前を選んでね！'); return; }
     var list = Object.keys(state.picked).map(function (k) { return { key: k, level: state.picked[k] }; });
     if (list.some(function (a) { return !a.level; })) { fail('重さを選んでいないものがあるよ！'); return; }
-    if (!state.none && !list.length) { fail('当てはまるものを選ぶか、「' + T.NONE_LABEL + '」を押してね！'); return; }
+    var otherText = other.value.trim();
+    if (!state.none && !list.length && !otherText) { fail('当てはまるものを選ぶか、「' + T.NONE_LABEL + '」を押してね！'); return; }
     var btn = $('submit');
     btn.disabled = true; btn.textContent = '送っています…';
-    sendAnswer({ name: sel.value, none: state.none, allergies: list },
+    sendAnswer({ name: sel.value, none: state.none, allergies: list, other: otherText, wishes: wishList() },
       function (r) {
         btn.disabled = false; btn.textContent = T.SUBMIT;
         if (!r || !r.ok) { fail((r && r.message) || '送れませんでした。もう一度押してね。'); return; }
@@ -399,7 +448,8 @@ function startSurvey(BOOT) {
 
   // 入れ直すときは、まっさらにする（前の人の選んだものを残さない）
   $('again').addEventListener('click', function () {
-    state = { picked: {}, none: false }; sel.value = '';
+    state = { picked: {}, none: false }; sel.value = ''; other.value = '';
+    wishInputs.forEach(function (i) { i.value = ''; });
     $('win').hidden = true; $('win-molly').src = img('jump');
     render(); window.scrollTo(0, 0);
   });
