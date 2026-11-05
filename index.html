@@ -248,6 +248,33 @@
   .chip.ok { background: rgba(25, 180, 106, .2); border-color: var(--emerald2); }
   .empty { color: var(--muted); font-size: 15px; }
 
+  /* 切り替え（今週の食べたい／アレルギー・好き嫌い） */
+  .modes { display: flex; gap: 8px; margin: 0 0 16px; }
+  .modes button { flex: 1 1 0; min-width: 0; min-height: 56px; padding: 6px 4px; cursor: pointer; font: 900 clamp(14px, 4.2vw, 17px)/1.25 'M PLUS Rounded 1c', sans-serif;
+    color: var(--muted); border-radius: 16px; border: 2px solid rgba(255, 255, 255, .25); background: rgba(0, 0, 0, .25); }
+  .modes button[aria-selected="true"] { color: #2a1260; border-color: #fff6cc; background: linear-gradient(180deg, var(--gold1), var(--gold2) 50%, var(--gold3));
+    box-shadow: 0 4px 0 var(--gold-dark), 0 0 16px rgba(255, 211, 77, .55); }
+  .week-day { display: inline-block; margin: 0 4px 0 0; padding: 0 10px; border-radius: 999px; font-weight: 900; color: #2a1260; background: linear-gradient(180deg, #ffd6f0, #ff7ac4); }
+
+  /* モリーが作る（送ったあと） */
+  .cook { position: fixed; inset: 0; z-index: 11; display: grid; place-items: center; overflow: hidden;
+    background: radial-gradient(circle, rgba(74, 28, 124, .985), rgba(18, 10, 51, .995)); }
+  .cook-inner { position: relative; z-index: 2; width: min(92vw, 480px); text-align: center; }
+  .cook-title { margin: 0 0 10px; font: 900 clamp(24px, 7vw, 34px)/1.2 'M PLUS Rounded 1c', sans-serif;
+    background: linear-gradient(180deg, #fffbe6, var(--gold2) 55%, var(--gold3)); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 3px 0 var(--gold-dark)); animation: great .6s cubic-bezier(.2, 1.6, .4, 1) both; }
+  .stage { position: relative; width: min(74vw, 330px); margin: 0 auto; aspect-ratio: 3 / 4; border-radius: 22px; overflow: hidden; border: 4px solid var(--gold2);
+    box-shadow: 0 0 0 3px var(--night1), 0 0 30px rgba(255, 211, 77, .6); background: #fff; }
+  .stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .stage img.off { opacity: 0; }
+  .steam { position: absolute; bottom: 30%; width: 22px; height: 22px; border-radius: 50%; background: rgba(255, 255, 255, .75); filter: blur(4px);
+    animation: steam 2.2s ease-out infinite; }
+  @keyframes steam { 0% { transform: translateY(0) scale(.6); opacity: 0; } 25% { opacity: .9; } 100% { transform: translateY(-140px) scale(1.8); opacity: 0; } }
+  .spark { position: absolute; color: #fff6b0; font-size: 22px; text-shadow: 0 0 8px #ffd34d; animation: twinkle 1.4s ease-in-out infinite; }
+  @keyframes twinkle { 0%, 100% { transform: scale(.4) rotate(0); opacity: 0; } 50% { transform: scale(1.2) rotate(30deg); opacity: 1; } }
+  .cook-card { margin-top: 12px; padding: 14px 14px 16px; border-radius: 18px; background: var(--panel); border: 2px solid var(--panel-line); animation: rise .4s ease-out .4s both; }
+  .cook-card p { margin: 0 0 12px; font-weight: 700; }
+
   [hidden] { display: none !important; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -270,20 +297,34 @@
   <p class="bubble" id="bubble" role="status"></p>
   <button type="button" class="open-stats" id="open-stats" hidden></button>
 
-  <div class="steps" aria-hidden="true">
-    <div class="step" id="st-name"><span class="gem"></span>名前</div><span class="bar" id="bar-1"></span>
-    <div class="step" id="st-allergy"><span class="gem"></span>アレルギー</div><span class="bar" id="bar-2"></span>
-    <div class="step" id="st-likes"><span class="gem"></span>好き嫌い</div><span class="bar" id="bar-3"></span>
-    <div class="step" id="st-wish"><span class="gem"></span>食べたい</div><span class="bar" id="bar-4"></span>
-    <div class="step" id="st-send"><span class="gem"></span>送る</div>
+  <section class="panel">
+    <h2 class="ptitle"><span class="num">1</span><label for="name" id="t-name"></label></h2>
+    <p class="error" id="roster-error" hidden></p>
+    <select id="name"></select>
+  </section>
+
+  <div class="modes" role="tablist">
+    <button type="button" role="tab" id="mode-weekly" aria-selected="true"></button>
+    <button type="button" role="tab" id="mode-survey" aria-selected="false"></button>
   </div>
 
-  <form id="form" novalidate>
+  <div id="view-weekly">
     <section class="panel">
-      <h2 class="ptitle"><span class="num">1</span><label for="name" id="t-name"></label></h2>
-      <p class="error" id="roster-error" hidden></p>
-      <select id="name"></select>
+      <h2 class="ptitle"><span class="num">2</span><span id="t-weekly"></span></h2>
+      <p class="sub"><span class="week-day" id="t-week-day"></span><span id="t-weekly-lead"></span></p>
+      <div id="weekly-wishes"></div>
     </section>
+    <button type="button" class="go" id="weekly-send"></button>
+    <p class="msg" id="weekly-msg" role="alert"></p>
+  </div>
+
+  <form id="form" novalidate hidden>
+    <div class="steps" aria-hidden="true">
+      <div class="step" id="st-name"><span class="gem"></span>名前</div><span class="bar" id="bar-1"></span>
+      <div class="step" id="st-allergy"><span class="gem"></span>アレルギー</div><span class="bar" id="bar-2"></span>
+      <div class="step" id="st-likes"><span class="gem"></span>好き嫌い</div><span class="bar" id="bar-3"></span>
+      <div class="step" id="st-send"><span class="gem"></span>送る</div>
+    </div>
 
     <section class="panel">
       <h2 class="ptitle"><span class="num">2</span><span id="t-allergy"></span></h2>
@@ -298,12 +339,6 @@
       <p class="sub" id="t-likes-lead"></p>
       <div id="likes"></div>
       <div class="other"><label for="likes-note" id="t-likes-note"></label><input class="field" id="likes-note" type="text" autocomplete="off"></div>
-    </section>
-
-    <section class="panel">
-      <h2 class="ptitle"><span class="num">4</span><span id="t-wish"></span></h2>
-      <p class="sub" id="t-wish-lead"></p>
-      <div id="wishes"></div>
     </section>
 
     <p class="privacy" id="t-privacy"></p>
@@ -326,6 +361,23 @@
   </div>
 </div>
 
+<div class="cook" id="cook" hidden>
+  <div class="burst" style="position:absolute;width:160vmax;height:160vmax;border-radius:50%;opacity:.35;left:50%;top:40%;transform:translate(-50%,-50%);background:repeating-conic-gradient(rgba(255,220,120,.55) 0deg 7deg,transparent 7deg 20deg);animation:spin 14s linear infinite"></div>
+  <div class="cook-inner">
+    <h2 class="cook-title" id="t-cook"></h2>
+    <div class="stage" id="stage">
+      <img id="cook-a" alt=""><img id="cook-b" alt="" class="off">
+      <span class="steam" style="left:38%;animation-delay:0s"></span><span class="steam" style="left:50%;animation-delay:.7s"></span><span class="steam" style="left:62%;animation-delay:1.4s"></span>
+      <span class="spark" style="left:10%;top:12%">✦</span><span class="spark" style="right:12%;top:18%;animation-delay:.5s">✦</span><span class="spark" style="left:16%;bottom:14%;animation-delay:.9s">✦</span>
+    </div>
+    <div class="cook-card">
+      <p id="cook-text" role="status"></p>
+      <button type="button" class="again" id="cook-stats"></button>
+      <p style="margin:12px 0 0"><button type="button" class="again" id="cook-close">とじる</button></p>
+    </div>
+  </div>
+</div>
+
 <div class="stats" id="stats" hidden>
   <div class="wrap">
     <div class="st-head"><h2 id="t-stats"></h2><img id="stats-molly" alt=""></div>
@@ -339,7 +391,7 @@
   // Apps Script で開いたときは中身を埋め込む。GitHub Pages では BOOT は null で、開いたあと API から受け取る
   //（2026-11-05 代表「このアプリケーションは Google Apps Script のユーザーによって…」の帯を出さないため）
   var BOOT = null;
-  var ART = {"ladle":"molly_ladle.png","dish":"molly_dish.png","wait":"molly_wait.png","jump":"molly_jump.png","food_washoku":"food_washoku.jpg","food_yoshoku":"food_yoshoku.jpg","food_chuka":"food_chuka.jpg","food_curry":"food_curry.jpg","food_noodle":"food_noodle.jpg","food_donburi":"food_donburi.jpg","food_fried":"food_fried.jpg","food_meatdish":"food_meatdish.jpg","food_fishdish":"food_fishdish.jpg","food_vegdish":"food_vegdish.jpg","food_soup":"food_soup.jpg","food_dessert":"food_dessert.jpg","food_mushroom":"food_mushroom.jpg","food_greenpepper":"food_greenpepper.jpg","food_eggplant":"food_eggplant.jpg","food_negi":"food_negi.jpg","food_coriander":"food_coriander.jpg","food_natto":"food_natto.jpg","food_liver":"food_liver.jpg","food_umeboshi":"food_umeboshi.jpg"};
+  var ART = {"ladle":"molly_ladle.png","dish":"molly_dish.png","wait":"molly_wait.png","jump":"molly_jump.png","food_washoku":"food_washoku.jpg","food_yoshoku":"food_yoshoku.jpg","food_chuka":"food_chuka.jpg","food_curry":"food_curry.jpg","food_noodle":"food_noodle.jpg","food_donburi":"food_donburi.jpg","food_fried":"food_fried.jpg","food_meatdish":"food_meatdish.jpg","food_fishdish":"food_fishdish.jpg","food_vegdish":"food_vegdish.jpg","food_soup":"food_soup.jpg","food_dessert":"food_dessert.jpg","food_mushroom":"food_mushroom.jpg","food_greenpepper":"food_greenpepper.jpg","food_eggplant":"food_eggplant.jpg","food_negi":"food_negi.jpg","food_coriander":"food_coriander.jpg","food_natto":"food_natto.jpg","food_liver":"food_liver.jpg","food_umeboshi":"food_umeboshi.jpg","cook_washoku_1":"cook_washoku_1.jpg","cook_washoku_2":"cook_washoku_2.jpg","cook_yoshoku_1":"cook_yoshoku_1.jpg","cook_yoshoku_2":"cook_yoshoku_2.jpg","cook_chuka_1":"cook_chuka_1.jpg","cook_chuka_2":"cook_chuka_2.jpg","cook_curry_1":"cook_curry_1.jpg","cook_curry_2":"cook_curry_2.jpg","cook_noodle_1":"cook_noodle_1.jpg","cook_noodle_2":"cook_noodle_2.jpg","cook_donburi_1":"cook_donburi_1.jpg","cook_donburi_2":"cook_donburi_2.jpg","cook_fried_1":"cook_fried_1.jpg","cook_fried_2":"cook_fried_2.jpg","cook_meatdish_1":"cook_meatdish_1.jpg","cook_meatdish_2":"cook_meatdish_2.jpg","cook_fishdish_1":"cook_fishdish_1.jpg","cook_fishdish_2":"cook_fishdish_2.jpg","cook_vegdish_1":"cook_vegdish_1.jpg","cook_vegdish_2":"cook_vegdish_2.jpg","cook_soup_1":"cook_soup_1.jpg","cook_soup_2":"cook_soup_2.jpg","cook_dessert_1":"cook_dessert_1.jpg","cook_dessert_2":"cook_dessert_2.jpg","cook_any_1":"cook_any_1.jpg","cook_any_2":"cook_any_2.jpg"};
   var API = "https://script.google.com/macros/s/AKfycbzu0u4K4k8pBdhBoKTVwdoxPIe8EfF6ipDirCPoBCJKCW5NaK77QEPVugXWlCUnZmQ/exec";
 </script>
 <script>
@@ -351,7 +403,6 @@ function startSurvey(BOOT) {
     allergy: 'ありがとう！ 次は食べられないものだよ。',
     level: 'どのくらい？ 重さも選んでね。',
     likes: '好きなもの・苦手なものも教えてね！ 分かるものだけでいいよ。',
-    wish: 'あとは食べたいランチを書いてね！ 空でも送れるよ。',
     ready: '準備OK！ 下の金色のボタンで送ってね！'
   };
 
@@ -377,21 +428,106 @@ function startSurvey(BOOT) {
     if (other.value.trim() && state.none) { state.none = false; $('none').setAttribute('aria-pressed', 'false'); }
     progress();
   });
-  $('t-wish').textContent = T.WISH_TITLE; $('t-wish-lead').textContent = T.WISH_LEAD;
+  // 毎週の食べたいランチ（2026-11-05 代表「毎週食べたい希望を聞いて水曜日に作る」）
+  var W = BOOT.weekly;
+  $('t-weekly').textContent = T.WEEKLY_TITLE; $('t-week-day').textContent = W.label; $('t-weekly-lead').textContent = T.WEEKLY_LEAD;
+  $('weekly-send').textContent = T.WEEKLY_SEND;
   var wishInputs = [];
-  for (var wi = 0; wi < BOOT.wishes.max; wi++) {
+  for (var wi = 0; wi < W.max; wi++) {
     var row = el('div', 'wish');
     row.appendChild(el('span', 'no', String(wi + 1)));
     var inp = el('input', 'field');
-    inp.type = 'text'; inp.autocomplete = 'off'; inp.maxLength = BOOT.wishes.maxChars;
-    inp.placeholder = (T.WISH_PLACEHOLDERS || [])[wi] || '';
-    inp.setAttribute('aria-label', T.WISH_TITLE + ' ' + (wi + 1));
-    inp.addEventListener('input', function () { progress(); });
+    inp.type = 'text'; inp.autocomplete = 'off'; inp.maxLength = W.maxChars;
+    inp.placeholder = (T.WEEKLY_PLACEHOLDERS || [])[wi] || '';
+    inp.setAttribute('aria-label', T.WEEKLY_TITLE + ' ' + (wi + 1));
+    inp.addEventListener('input', function () { talkWeekly(); });
     row.appendChild(inp);
-    $('wishes').appendChild(row);
+    $('weekly-wishes').appendChild(row);
     wishInputs.push(inp);
   }
   function wishList() { return wishInputs.map(function (i) { return i.value.trim(); }).filter(function (v) { return v; }); }
+
+  // 切り替え
+  var mode = 'weekly';
+  $('mode-weekly').textContent = T.MODE_WEEKLY; $('mode-survey').textContent = T.MODE_SURVEY;
+  function setMode(m) {
+    mode = m;
+    $('mode-weekly').setAttribute('aria-selected', m === 'weekly' ? 'true' : 'false');
+    $('mode-survey').setAttribute('aria-selected', m === 'survey' ? 'true' : 'false');
+    $('view-weekly').hidden = m !== 'weekly';
+    $('form').hidden = m !== 'survey';
+    if (m === 'weekly') talkWeekly(); else progress();
+  }
+  $('mode-weekly').addEventListener('click', function () { setMode('weekly'); });
+  $('mode-survey').addEventListener('click', function () { setMode('survey'); });
+  function talkWeekly() {
+    if (mode !== 'weekly') return;
+    if (!sel.value) say('名前を選んで、' + W.label + 'に食べたいものを教えてね！');
+    else if (!wishList().length) say('何が食べたい？ 3つまで書いてね！');
+    else say('いいね！ 金色の「送る」を押してね！');
+    $('weekly-send').classList.toggle('ready', !!sel.value && wishList().length > 0 && !BOOT.rosterError);
+  }
+
+  // 書いた料理に近い場面（上から順に言葉を探す。無ければ any）
+  function foldText(s) {
+    s = String(s || '');
+    try { s = s.normalize('NFKC'); } catch (e) { /* 古い端末 */ }
+    return s.toLowerCase().replace(/[\u30A1-\u30F6]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x60); }).replace(/\s/g, '');
+  }
+  function sceneOf(list) {
+    for (var i = 0; i < list.length; i++) {
+      var f = foldText(list[i]);
+      for (var j = 0; j < BOOT.cook.length; j++) {
+        var c = BOOT.cook[j];
+        for (var k = 0; k < c.words.length; k++) if (f.indexOf(foldText(c.words[k])) >= 0) return { key: c.key, dish: list[i] };
+      }
+    }
+    return { key: 'any', dish: list[0] || '' };
+  }
+  var cookTimer = null;
+  function showCook(list, label) {
+    var sc = sceneOf(list);
+    var a = $('cook-a'), b = $('cook-b');
+    a.src = img('cook_' + sc.key + '_1'); b.src = img('cook_' + sc.key + '_2');
+    a.className = ''; b.className = 'off';
+    $('t-cook').textContent = T.COOK_TITLE;
+    $('cook-text').textContent = '「' + sc.dish + '」を作ってるよ！ ' + label + T.WEEKLY_DONE;
+    $('cook').hidden = false;
+    var flip = false;
+    clearInterval(cookTimer);
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce) cookTimer = setInterval(function () { flip = !flip; a.className = flip ? 'off' : ''; b.className = flip ? '' : 'off'; }, 480);
+  }
+  function closeCook() { clearInterval(cookTimer); $('cook').hidden = true; }
+  $('cook-close').addEventListener('click', closeCook);
+  $('cook-stats').addEventListener('click', function () { closeCook(); openStats(); });
+
+  $('weekly-send').addEventListener('click', function () {
+    var msg = $('weekly-msg');
+    var fail = function (text) {
+      msg.textContent = '';
+      var w = el('img'); w.src = img('wait'); w.alt = '';
+      msg.appendChild(w); msg.appendChild(el('span', '', text));
+      say(text, true);
+    };
+    msg.textContent = '';
+    if (!sel.value) { fail('名前を選んでね！'); return; }
+    var list = wishList();
+    if (!list.length) { fail('食べたいものを1つ以上書いてね！'); return; }
+    var btn = $('weekly-send');
+    btn.disabled = true; btn.textContent = '送っています…';
+    sendWeekly({ name: sel.value, wishes: list }, function (r) {
+      btn.disabled = false; btn.textContent = T.WEEKLY_SEND;
+      if (!r || !r.ok) { fail((r && r.message) || '送れませんでした。もう一度押してね。'); return; }
+      if (r.label) $('t-week-day').textContent = r.label; // 開いたまま水曜14時をまたいだときも、受け付けた週を出す
+      showCook(list, r.label || W.label);
+      wishInputs.forEach(function (i) { i.value = ''; });
+      talkWeekly();
+    }, function () {
+      btn.disabled = false; btn.textContent = T.WEEKLY_SEND;
+      fail('つながりませんでした。もう一度押してね。');
+    });
+  });
   // 好き嫌いのカード
   $('t-likes').textContent = T.LIKES_TITLE; $('t-likes-lead').textContent = T.LIKES_LEAD;
   $('t-likes-note').textContent = T.LIKES_NOTE_LABEL;
@@ -441,7 +577,17 @@ function startSurvey(BOOT) {
   var first = el('option', '', T.NAME_PLACEHOLDER); first.value = ''; sel.appendChild(first);
   BOOT.names.forEach(function (n) { var o = el('option', '', n); o.value = n; sel.appendChild(o); });
   if (BOOT.rosterError) { $('roster-error').textContent = BOOT.rosterError; $('roster-error').hidden = false; $('submit').disabled = true; }
-  sel.addEventListener('change', render);
+  // 名前を変えたら、書きかけを全部消す（前の人の入力を次の人の名前で送らない。猪八戒の点検 重大）
+  var lastName = '';
+  sel.addEventListener('change', function () {
+    if (lastName && sel.value !== lastName) {
+      state = { picked: {}, none: false, likes: {} }; other.value = ''; likesNote.value = '';
+      wishInputs.forEach(function (i) { i.value = ''; });
+      renderLikes();
+    }
+    lastName = sel.value;
+    render(); talkWeekly();
+  });
 
   function say(text, warn) {
     var b = $('bubble');
@@ -459,7 +605,6 @@ function startSurvey(BOOT) {
     var hasOther = !!other.value.trim();
     var allergyDone = state.none || ((keys.length > 0 || hasOther) && levelsDone);
     var nameDone = !!sel.value;
-    var wishDone = wishList().length > 0;
     var likesDone = Object.keys(state.likes).length > 0;
     $('st-name').classList.toggle('on', nameDone);
     $('bar-1').classList.toggle('on', nameDone);
@@ -467,15 +612,13 @@ function startSurvey(BOOT) {
     $('bar-2').classList.toggle('on', nameDone && allergyDone);
     $('st-likes').classList.toggle('on', likesDone);
     $('bar-3').classList.toggle('on', nameDone && allergyDone);
-    $('st-wish').classList.toggle('on', wishDone);
-    $('bar-4').classList.toggle('on', nameDone && allergyDone);
     $('st-send').classList.toggle('on', nameDone && allergyDone);
     $('submit').classList.toggle('ready', nameDone && allergyDone && !BOOT.rosterError);
+    if (mode !== 'survey') return;
     if (!nameDone) say(SAY.start);
     else if (keys.length && !levelsDone) say(SAY.level);
     else if (!allergyDone) say(SAY.allergy);
     else if (!likesDone) say(SAY.likes);
-    else if (!wishDone) say(SAY.wish);
     else say(SAY.ready);
   }
 
@@ -563,7 +706,7 @@ function startSurvey(BOOT) {
     if (!state.none && !list.length && !otherText) { fail('当てはまるものを選ぶか、「' + T.NONE_LABEL + '」を押してね！'); return; }
     var btn = $('submit');
     btn.disabled = true; btn.textContent = '送っています…';
-    sendAnswer({ name: sel.value, none: state.none, allergies: list, other: otherText, wishes: wishList(), likes: state.likes, likesNote: likesNote.value.trim() },
+    sendAnswer({ name: sel.value, none: state.none, allergies: list, other: otherText, likes: state.likes, likesNote: likesNote.value.trim() },
       function (r) {
         btn.disabled = false; btn.textContent = T.SUBMIT;
         if (!r || !r.ok) { fail((r && r.message) || '送れませんでした。もう一度押してね。'); return; }
@@ -580,7 +723,7 @@ function startSurvey(BOOT) {
 
   // 入れ直すときは、まっさらにする（前の人の選んだものを残さない）
   $('again').addEventListener('click', function () {
-    state = { picked: {}, none: false, likes: {} }; sel.value = ''; other.value = ''; likesNote.value = '';
+    state = { picked: {}, none: false, likes: {} }; sel.value = ''; lastName = ''; other.value = ''; likesNote.value = '';
     wishInputs.forEach(function (i) { i.value = ''; });
     renderLikes();
     $('win').hidden = true; $('win-molly').src = img('jump');
@@ -612,19 +755,18 @@ function startSurvey(BOOT) {
     return p;
   }
   function showStats(r) {
-    var head = section('答えてくれた人');
+    var head = section('アンケートに答えてくれた人');
     var big = el('div', 'count-big');
     big.appendChild(el('b', '', String(r.respondents)));
     big.appendChild(document.createTextNode('人 / ' + r.roster + '人'));
     head.appendChild(big);
     var m = el('div', 'meter'); var mi = el('i'); mi.style.width = Math.min(100, Math.round(r.respondents * 100 / Math.max(1, r.roster))) + '%'; m.appendChild(mi); head.appendChild(m);
     head.appendChild(el('p', 'sub', T.STATS_LEAD));
-    if (r.few) { $('stats-bubble').textContent = T.STATS_FEW; $('stats-molly').src = img('wait'); return; }
-
-    var w = section('食べたいランチ ランキング', r.wishers + '人が書いてくれました（似ている料理はまとめています）');
-    if (!r.wishes.length) w.appendChild(el('p', 'empty', 'まだありません'));
-    var top = r.wishes.length ? r.wishes[0].count : 1;
-    r.wishes.forEach(function (x, i) {
+    var wk = r.weekly || { label: W.label, wishers: 0, wishes: [] };
+    var w = section(wk.label + 'の食べたいランチ', wk.wishers + '人が書いてくれました（似ている料理はまとめています）');
+    if (!wk.wishes.length) w.appendChild(el('p', 'empty', 'まだありません。「' + T.MODE_WEEKLY + '」から書いてね！'));
+    var top = wk.wishes.length ? wk.wishes[0].count : 1;
+    wk.wishes.forEach(function (x, i) {
       var row = el('div', 'rank' + (i < 3 ? ' r' + (i + 1) : ''));
       row.appendChild(el('span', 'no', String(i + 1)));
       var body = el('div', 'body');
@@ -634,6 +776,13 @@ function startSurvey(BOOT) {
       row.appendChild(body);
       w.appendChild(row);
     });
+    // 答えてくれた人は、アレルギー・好き嫌いのアンケートの人数
+    $('stats-body').appendChild(head);
+    if (r.few) {
+      $('stats-bubble').textContent = (wk.wishes.length ? wk.label + 'の1位は「' + wk.wishes[0].label + '」！ ' : '') + T.STATS_FEW;
+      $('stats-molly').src = img(wk.wishes.length ? 'dish' : 'wait');
+      return;
+    }
 
     var l = section('好きなもの・苦手なもの');
     var lg = el('div', 'legend');
@@ -672,7 +821,7 @@ function startSurvey(BOOT) {
       if (c.dislike && (!worst || c.dislike > worst.dislike)) worst = c;
     });
     var talk = r.roster + '人中 ' + r.respondents + '人が答えてくれたよ！';
-    if (r.wishes.length) talk += ' 食べたいランチの1位は「' + r.wishes[0].label + '」！';
+    if (wk.wishes.length) talk += ' ' + wk.label + 'の食べたいランチ1位は「' + wk.wishes[0].label + '」！';
     if (best) talk += ' 好きがいちばん多いのは「' + best.label + '」。';
     if (worst) talk += ' 苦手が多いのは「' + worst.label + '」だから気をつけるね。';
     $('stats-bubble').textContent = talk; $('stats-molly').src = img('dish');
@@ -681,7 +830,20 @@ function startSurvey(BOOT) {
   $('win-stats').addEventListener('click', function () { $('win').hidden = true; $('win-molly').src = img('jump'); openStats(); });
   $('close-stats').addEventListener('click', function () { $('stats').hidden = true; });
 
+  $('cook-stats').textContent = T.STATS_BUTTON;
   render();
+  setMode('weekly');
+}
+
+/** 毎週の希望を送る。Apps Script の中なら google.script.run、GitHub Pages なら API へ */
+function sendWeekly(input, onOk, onNg) {
+  if (window.google && google.script && google.script.run) {
+    google.script.run.withSuccessHandler(onOk).withFailureHandler(onNg).submitWeekly(input);
+    return;
+  }
+  fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, credentials: 'omit', cache: 'no-store',
+    body: JSON.stringify({ action: 'weekly', input: input }) })
+    .then(function (r) { return r.json(); }).then(onOk, onNg);
 }
 
 /** 集計を受け取る。Apps Script の中なら google.script.run、GitHub Pages なら API へ */
