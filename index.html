@@ -254,7 +254,6 @@
     color: var(--muted); border-radius: 16px; border: 2px solid rgba(255, 255, 255, .25); background: rgba(0, 0, 0, .25); }
   .modes button[aria-selected="true"] { color: #2a1260; border-color: #fff6cc; background: linear-gradient(180deg, var(--gold1), var(--gold2) 50%, var(--gold3));
     box-shadow: 0 4px 0 var(--gold-dark), 0 0 16px rgba(255, 211, 77, .55); }
-  .week-day { display: inline-block; margin: 0 4px 0 0; padding: 0 10px; border-radius: 999px; font-weight: 900; color: #2a1260; background: linear-gradient(180deg, #ffd6f0, #ff7ac4); }
 
   /* モリーが作る（送ったあと） */
   .cook { position: fixed; inset: 0; z-index: 11; display: grid; place-items: center; overflow: hidden;
@@ -311,7 +310,7 @@
   <div id="view-weekly">
     <section class="panel">
       <h2 class="ptitle"><span class="num">2</span><span id="t-weekly"></span></h2>
-      <p class="sub"><span class="week-day" id="t-week-day"></span><span id="t-weekly-lead"></span></p>
+      <p class="sub" id="t-weekly-lead"></p>
       <div id="weekly-wishes"></div>
     </section>
     <button type="button" class="go" id="weekly-send"></button>
@@ -430,7 +429,7 @@ function startSurvey(BOOT) {
   });
   // 毎週の食べたいランチ（2026-11-05 代表「毎週食べたい希望を聞いて水曜日に作る」）
   var W = BOOT.weekly;
-  $('t-weekly').textContent = T.WEEKLY_TITLE; $('t-week-day').textContent = W.label; $('t-weekly-lead').textContent = T.WEEKLY_LEAD;
+  $('t-weekly').textContent = T.WEEKLY_TITLE; $('t-weekly-lead').textContent = T.WEEKLY_LEAD;
   $('weekly-send').textContent = T.WEEKLY_SEND;
   var wishInputs = [];
   for (var wi = 0; wi < W.max; wi++) {
@@ -462,7 +461,7 @@ function startSurvey(BOOT) {
   $('mode-survey').addEventListener('click', function () { setMode('survey'); });
   function talkWeekly() {
     if (mode !== 'weekly') return;
-    if (!sel.value) say('名前を選んで、' + W.label + 'に食べたいものを教えてね！');
+    if (!sel.value) say('名前を選んで、次のランチで食べたいものを教えてね！');
     else if (!wishList().length) say('何が食べたい？ 3つまで書いてね！');
     else say('いいね！ 金色の「送る」を押してね！');
     $('weekly-send').classList.toggle('ready', !!sel.value && wishList().length > 0 && !BOOT.rosterError);
@@ -485,13 +484,13 @@ function startSurvey(BOOT) {
     return { key: 'any', dish: list[0] || '' };
   }
   var cookTimer = null;
-  function showCook(list, label) {
+  function showCook(list) {
     var sc = sceneOf(list);
     var a = $('cook-a'), b = $('cook-b');
     a.src = img('cook_' + sc.key + '_1'); b.src = img('cook_' + sc.key + '_2');
     a.className = ''; b.className = 'off';
     $('t-cook').textContent = T.COOK_TITLE;
-    $('cook-text').textContent = '「' + sc.dish + '」を作ってるよ！ ' + label + T.WEEKLY_DONE;
+    $('cook-text').textContent = '「' + sc.dish + '」を作ってるよ！ ' + T.WEEKLY_DONE;
     $('cook').hidden = false;
     var flip = false;
     clearInterval(cookTimer);
@@ -519,8 +518,7 @@ function startSurvey(BOOT) {
     sendWeekly({ name: sel.value, wishes: list }, function (r) {
       btn.disabled = false; btn.textContent = T.WEEKLY_SEND;
       if (!r || !r.ok) { fail((r && r.message) || '送れませんでした。もう一度押してね。'); return; }
-      if (r.label) $('t-week-day').textContent = r.label; // 開いたまま水曜14時をまたいだときも、受け付けた週を出す
-      showCook(list, r.label || W.label);
+      showCook(list);
       wishInputs.forEach(function (i) { i.value = ''; });
       talkWeekly();
     }, function () {
@@ -762,8 +760,8 @@ function startSurvey(BOOT) {
     head.appendChild(big);
     var m = el('div', 'meter'); var mi = el('i'); mi.style.width = Math.min(100, Math.round(r.respondents * 100 / Math.max(1, r.roster))) + '%'; m.appendChild(mi); head.appendChild(m);
     head.appendChild(el('p', 'sub', T.STATS_LEAD));
-    var wk = r.weekly || { label: W.label, wishers: 0, wishes: [] };
-    var w = section(wk.label + 'の食べたいランチ', wk.wishers + '人が書いてくれました（似ている料理はまとめています）');
+    var wk = r.weekly || { wishers: 0, wishes: [] };
+    var w = section('次のランチ 食べたいランキング', wk.wishers + '人が書いてくれました（似ている料理はまとめています）');
     if (!wk.wishes.length) w.appendChild(el('p', 'empty', 'まだありません。「' + T.MODE_WEEKLY + '」から書いてね！'));
     var top = wk.wishes.length ? wk.wishes[0].count : 1;
     wk.wishes.forEach(function (x, i) {
@@ -779,7 +777,7 @@ function startSurvey(BOOT) {
     // 答えてくれた人は、アレルギー・好き嫌いのアンケートの人数
     $('stats-body').appendChild(head);
     if (r.few) {
-      $('stats-bubble').textContent = (wk.wishes.length ? wk.label + 'の1位は「' + wk.wishes[0].label + '」！ ' : '') + T.STATS_FEW;
+      $('stats-bubble').textContent = (wk.wishes.length ? '次のランチの1位は「' + wk.wishes[0].label + '」！ ' : '') + T.STATS_FEW;
       $('stats-molly').src = img(wk.wishes.length ? 'dish' : 'wait');
       return;
     }
@@ -821,7 +819,7 @@ function startSurvey(BOOT) {
       if (c.dislike && (!worst || c.dislike > worst.dislike)) worst = c;
     });
     var talk = r.roster + '人中 ' + r.respondents + '人が答えてくれたよ！';
-    if (wk.wishes.length) talk += ' ' + wk.label + 'の食べたいランチ1位は「' + wk.wishes[0].label + '」！';
+    if (wk.wishes.length) talk += ' 次のランチで食べたいもの1位は「' + wk.wishes[0].label + '」！';
     if (best) talk += ' 好きがいちばん多いのは「' + best.label + '」。';
     if (worst) talk += ' 苦手が多いのは「' + worst.label + '」だから気をつけるね。';
     $('stats-bubble').textContent = talk; $('stats-molly').src = img('dish');
