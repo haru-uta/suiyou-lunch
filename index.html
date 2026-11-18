@@ -266,6 +266,13 @@
   .menu .inside { padding: 0 14px 14px; border-top: 1px solid rgba(255, 214, 102, .25); }
   .menu h4 { margin: 14px 0 6px; font: 900 17px 'M PLUS Rounded 1c', sans-serif; color: var(--gold1); }
   .menu .serves { margin: 0 0 4px; font-size: 15px; color: var(--muted); }
+  .people { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 4px 0 6px; }
+  .people b { min-width: 92px; text-align: center; font: 900 24px 'M PLUS Rounded 1c', sans-serif; color: var(--gold1); }
+  .people .pm { width: 52px; height: 52px; border-radius: 50%; cursor: pointer; font: 900 26px/1 'M PLUS Rounded 1c', sans-serif; color: #2a1260;
+    border: 2px solid #fff6cc; background: linear-gradient(180deg, var(--gold1), var(--gold2) 50%, var(--gold3)); box-shadow: 0 3px 0 var(--gold-dark); }
+  .people .pm:disabled { opacity: .35; cursor: default; }
+  .people .reset { min-height: 44px; padding: 0 14px; border-radius: 999px; cursor: pointer; font: 800 14px 'M PLUS Rounded 1c', sans-serif; color: var(--text);
+    border: 2px solid var(--muted); background: transparent; }
   .ings { margin: 0; padding: 0; list-style: none; }
   .ings li { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px dashed rgba(255, 255, 255, .14); font-size: 16px; line-height: 1.5; }
   .ings .q { flex: 0 0 auto; max-width: 48%; text-align: right; color: var(--gold1); font-weight: 700; overflow-wrap: anywhere; }
@@ -869,12 +876,22 @@ function startSurvey(BOOT) {
   // これまでのランチと作り方（2026-11-18。中身は秘書が回答の表へ書き出した分）
   $('open-menus').textContent = T.MENUS_BUTTON; $('open-menus').hidden = false;
   $('t-menus').textContent = T.MENUS_TITLE; $('close-menus').textContent = T.BACK;
-  function qtyText(x) {
-    if (x.qty == null) return x.unit || '';
-    var n = Math.round(x.qty * 100) / 100;
-    var spoon = /^(大さじ|小さじ|カップ)$/.test(x.unit);
-    return spoon ? x.unit + n : n + x.unit;
+  // 分量を人数に合わせて直す（2026-11-18 代表「作り方で人数選択できるようにできる？」）。
+  // 決まりは秘書のランチ（haruuta-hisho の lunchQtyText）と同じ: 大さじ・小さじ・個・本などは 0.5 刻みで、0.25 に満たなければ「少し」。
+  // g・ml は 100 以上で 10 刻み、10 以上で整数、1 未満は小数第2位まで（0 と出さない）。秘書を直したらここも直す
+  var COUNT_UNITS = ['個', '本', '袋', '枚', '玉', '丁', 'パック', '缶', '株', '束', '切れ', 'かけ', '片', '房', '尾', '杯'];
+  function qtyText(x, people, serves) {
+    if (typeof x.qty !== 'number') return x.unit || '';
+    var q = serves ? x.qty * people / serves : x.qty;
+    var unit = x.unit || '';
+    var half = function (v) { return Math.max(0.5, Math.round(v * 2) / 2); };
+    var num = function (v) { return v >= 1 ? String(Math.round(v * 10) / 10) : String(Math.max(0.01, Math.round(v * 100) / 100)); };
+    if (/^(大さじ|小さじ|カップ)/.test(unit)) return q < 0.25 ? unit + ' 少し' : unit + num(half(q));
+    if (COUNT_UNITS.indexOf(unit) >= 0) return q < 0.25 ? '少し（' + unit + '）' : num(half(q)) + unit;
+    if (/^(g|ml|cc|グラム|ミリリットル)$/i.test(unit)) return (q >= 100 ? String(Math.round(q / 10) * 10) : q >= 10 ? String(Math.round(q)) : num(q)) + unit;
+    return num(q) + unit;
   }
+  window.__qtyText = qtyText; // 見本の試験で決まりを確かめる用
   function openMenus() {
     $('menus').hidden = false; $('menus').scrollTop = 0;
     $('menus-molly').src = img('ladle');
@@ -904,18 +921,48 @@ function startSurvey(BOOT) {
       else {
         if (rc.ingredients.length) {
           box.appendChild(el('h4', '', '材料'));
-          if (rc.serves) box.appendChild(el('p', 'serves', rc.serves + '人分'));
           var ul = el('ul', 'ings');
-          rc.ingredients.forEach(function (x) {
-            var li = el('li');
-            var n = el('span', 'n', x.name);
-            var q = qtyText(x);
-            if (x.note && q) n.appendChild(el('small', '', x.note));
-            li.appendChild(n);
-            li.appendChild(el('span', 'q', q || x.note || ''));
-            ul.appendChild(li);
-          });
-          box.appendChild(ul);
+          var drawIngs = function (people) {
+            ul.textContent = '';
+            rc.ingredients.forEach(function (x) {
+              var li = el('li');
+              var n = el('span', 'n', x.name);
+              var q = qtyText(x, people, rc.serves);
+              if (x.note && q) n.appendChild(el('small', '', x.note));
+              li.appendChild(n);
+              li.appendChild(el('span', 'q', q || x.note || ''));
+              ul.appendChild(li);
+            });
+          };
+          if (rc.serves) {
+            // 人数を選ぶ（開いたときは元の人数。1〜100人）
+            var people = rc.serves;
+            var row = el('div', 'people');
+            var minus = el('button', 'pm', '−'); minus.type = 'button'; minus.setAttribute('aria-label', '1人へらす');
+            var shown = el('b', '', ''); shown.setAttribute('aria-live', 'polite');
+            var plus = el('button', 'pm', '＋'); plus.type = 'button'; plus.setAttribute('aria-label', '1人ふやす');
+            var reset = el('button', 'reset', '元にもどす'); reset.type = 'button';
+            var hint = el('p', 'serves', '');
+            var set = function (n) {
+              people = Math.max(1, Math.min(100, n));
+              shown.textContent = people + '人分';
+              minus.disabled = people <= 1; plus.disabled = people >= 100;
+              reset.hidden = people === rc.serves;
+              hint.textContent = people === rc.serves ? '（元のレシピの人数）' : '（元は ' + rc.serves + '人分。小さい字のメモと作り方の文の中の量は元のままです）';
+              drawIngs(people);
+            };
+            minus.addEventListener('click', function () { set(people - 1); });
+            plus.addEventListener('click', function () { set(people + 1); });
+            reset.addEventListener('click', function () { set(rc.serves); });
+            row.appendChild(minus); row.appendChild(shown); row.appendChild(plus); row.appendChild(reset);
+            box.appendChild(row);
+            box.appendChild(hint);
+            box.appendChild(ul);
+            set(rc.serves);
+          } else {
+            drawIngs(0);
+            box.appendChild(ul);
+          }
         }
         if (rc.steps.length) {
           box.appendChild(el('h4', '', '作り方'));
