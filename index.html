@@ -935,13 +935,13 @@ function startSurvey(BOOT) {
             });
           };
           if (rc.serves) {
-            // 人数を選ぶ（開いたときは元の人数。1〜100人）
+            // 人数を選ぶ（開いたときは MENUS.DEFAULT_PEOPLE 人。1〜100人）
             var people = rc.serves;
             var row = el('div', 'people');
             var minus = el('button', 'pm', '−'); minus.type = 'button'; minus.setAttribute('aria-label', '1人へらす');
             var shown = el('b', '', ''); shown.setAttribute('aria-live', 'polite');
             var plus = el('button', 'pm', '＋'); plus.type = 'button'; plus.setAttribute('aria-label', '1人ふやす');
-            var reset = el('button', 'reset', '元にもどす'); reset.type = 'button';
+            var reset = el('button', 'reset', '元のレシピ（' + rc.serves + '人分）'); reset.type = 'button';
             var hint = el('p', 'serves', '');
             var set = function (n) {
               people = Math.max(1, Math.min(100, n));
@@ -958,7 +958,7 @@ function startSurvey(BOOT) {
             box.appendChild(row);
             box.appendChild(hint);
             box.appendChild(ul);
-            set(rc.serves);
+            set((BOOT.menus && BOOT.menus.defaultPeople) || 2);
           } else {
             drawIngs(0);
             box.appendChild(ul);
